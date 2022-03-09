@@ -18,9 +18,9 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g,
 
     auto bounds = Rectangle<float>(x, y, width, height);
     
-    g.setColour(Colour(234u, 226u, 183u));
+    g.setColour(Colour(3u, 57u, 51u));
     g.fillEllipse(bounds);
-    g.setColour(Colour(252u, 191u, 73u));
+    g.setColour(Colour(30u, 119u, 109u));
     g.drawEllipse(bounds, 1.f);
 
     auto center = bounds.getCentre();
@@ -50,6 +50,11 @@ void RotarySliderWithLabels::paint(juce::Graphics& g)
     auto range = getRange();
     auto sliderBounds = getSliderBounds();
 
+    g.setColour(Colours::red);
+    g.drawRect(getLocalBounds());
+    g.setColour(Colours::yellow);
+    g.drawRect(sliderBounds);
+
     getLookAndFeel().drawRotarySlider(g, sliderBounds.getX(), sliderBounds.getY(), 
                                         sliderBounds.getWidth(), sliderBounds.getHeight(), 
                                         jmap(getValue(), range.getStart(), range.getEnd(), 0.0, 1.0), 
@@ -58,7 +63,15 @@ void RotarySliderWithLabels::paint(juce::Graphics& g)
 
 juce::Rectangle<int> RotarySliderWithLabels::getSliderBounds() const
 {
-    return getLocalBounds();
+    auto bounds = getLocalBounds();
+
+    auto size = juce::jmin(bounds.getWidth(), bounds.getHeight());
+    size -= getTextHeight() * 2;
+    juce::Rectangle<int> r;
+    r.setSize(size, size);
+    r.setCentre(bounds.getCentreX(), 0);
+    r.setY(2);
+    return r;
 }
 //==============================================================================
 ResponseCurveComponent::ResponseCurveComponent(SimpleEQAudioProcessor& p) : audioProcessor(p){
