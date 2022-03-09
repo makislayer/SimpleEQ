@@ -47,7 +47,7 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g,
 
         r.setSize(strWidth + 4, rswl->getTextHeight() + 2);
         r.setCentre(bounds.getCentre());
-        g.setColour(Colour(20, 20u, 20u));
+        g.setColour(Colour(20u, 20u, 20u));
         g.fillRect(r);
 
         g.setColour(Colours::white);
@@ -65,10 +65,12 @@ void RotarySliderWithLabels::paint(juce::Graphics& g)
     auto range = getRange();
     auto sliderBounds = getSliderBounds();
 
+    /* Bounding boxes for debug purposes
     g.setColour(Colours::red);
     g.drawRect(getLocalBounds());
     g.setColour(Colours::yellow);
     g.drawRect(sliderBounds);
+    */
 
     getLookAndFeel().drawRotarySlider(g, sliderBounds.getX(), sliderBounds.getY(), 
                                         sliderBounds.getWidth(), sliderBounds.getHeight(), 
@@ -90,7 +92,33 @@ juce::Rectangle<int> RotarySliderWithLabels::getSliderBounds() const
 }
 juce::String RotarySliderWithLabels::getDisplayString() const
 {
-    return juce::String(getValue());
+    if (auto* choiceParam = dynamic_cast<juce::AudioParameterChoice*> (param))
+    {
+        return choiceParam->getCurrentChoiceName();
+    }
+
+    juce::String str;
+    bool addK = false;
+    
+    if (auto* floatParam = dynamic_cast<juce::AudioParameterFloat*>(param)) {
+        float val = getValue();
+        if (val > 999.f) {
+            val /= 1000.f;
+            addK = true;
+        }
+        str = juce::String(val, (addK ? 2 : 0));
+    }
+    else {jassertfalse;}
+    if (suffix.isNotEmpty()) 
+    {
+        str << " ";
+        if (addK)
+        {
+            str << "K";
+        }
+        str << suffix;
+    }
+    return str;
 }
 //==============================================================================
 ResponseCurveComponent::ResponseCurveComponent(SimpleEQAudioProcessor& p) : audioProcessor(p){
@@ -115,7 +143,7 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
 {
     using namespace juce;
     // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll(Colours::black);
+    g.fillAll(Colour(37u, 37u, 37u));
 
     auto responseArea = getLocalBounds();
 
@@ -165,8 +193,8 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
     for (size_t i = 1; i < mags.size(); ++i) {
         responseCurve.lineTo(responseArea.getX() + i, map(mags[i]));
     }
-    g.setColour(Colours::orange);
-    g.drawRoundedRectangle(responseArea.toFloat(), 4.f, 1.f);
+    g.setColour(Colour(79u, 79u, 79u));
+    g.drawRoundedRectangle(responseArea.toFloat(), 4.f, 3.f);
 
     g.setColour(Colours::white);
     g.strokePath(responseCurve, PathStrokeType(2.f));
@@ -225,7 +253,7 @@ SimpleEQAudioProcessorEditor::~SimpleEQAudioProcessorEditor()
 //==============================================================================
 void SimpleEQAudioProcessorEditor::paint(juce::Graphics& g) {
     using namespace juce;
-    g.fillAll(Colours::black);
+    g.fillAll(Colour(20u,20u,20u));
 }
 
 void SimpleEQAudioProcessorEditor::resized()
