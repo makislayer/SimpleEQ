@@ -146,6 +146,7 @@ ResponseCurveComponent::ResponseCurveComponent(SimpleEQAudioProcessor& p) : audi
     for (auto param : params) {
         param->addListener(this);
     }
+    updateChain();
     startTimerHz(60);
 }
 ResponseCurveComponent::~ResponseCurveComponent() {
@@ -222,19 +223,25 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
 
 void ResponseCurveComponent::timerCallback() {
     if (parametersChanged.compareAndSetBool(false, true)) {
+        DBG("params changed");
         //update the monochain
-        auto chainSettings = getChainSettings(audioProcessor.apvts);
-        auto peakCoefficients = makePeakFilter(chainSettings, audioProcessor.getSampleRate());
-        updateCoefficients(monoChain.get<ChainPositions::Peak>().coefficients, peakCoefficients);
-
-        auto LowCutCoefficients = makeLowCutFilter(chainSettings, audioProcessor.getSampleRate());
-        auto HighCutCoefficients = makeHighCutFilter(chainSettings, audioProcessor.getSampleRate());
-
-        updateCutFilter(monoChain.get<ChainPositions::LowCut>(), LowCutCoefficients, chainSettings.lowCutSlope);
-        updateCutFilter(monoChain.get<ChainPositions::HighCut>(), HighCutCoefficients, chainSettings.highCutSlope);
+        updateChain();
         //signal a rapaint
         repaint();
     }
+}
+
+void ResponseCurveComponent::updateChain() 
+{
+    auto chainSettings = getChainSettings(audioProcessor.apvts);
+    auto peakCoefficients = makePeakFilter(chainSettings, audioProcessor.getSampleRate());
+    updateCoefficients(monoChain.get<ChainPositions::Peak>().coefficients, peakCoefficients);
+
+    auto LowCutCoefficients = makeLowCutFilter(chainSettings, audioProcessor.getSampleRate());
+    auto HighCutCoefficients = makeHighCutFilter(chainSettings, audioProcessor.getSampleRate());
+
+    updateCutFilter(monoChain.get<ChainPositions::LowCut>(), LowCutCoefficients, chainSettings.lowCutSlope);
+    updateCutFilter(monoChain.get<ChainPositions::HighCut>(), HighCutCoefficients, chainSettings.highCutSlope);
 }
 
 //==============================================================================

@@ -53,6 +53,8 @@ struct ResponseCurveComponent : juce::Component, juce::AudioProcessorParameter::
 
     void timerCallback() override;
 
+    void updateChain();
+
     void paint(juce::Graphics& g) override;
 
 private: 
