@@ -231,9 +231,9 @@ void ResponseCurveComponent::resized()
     g.fillAll(Colour(25u,25u,25u));
     Array<float> freqs
     {
-        20,30,40,50,100,
-        200,300,400,500,1000,
-        2000,3000,4000,5000,10000,
+        20,/*30,40,*/50,100,
+        200,/*300,400,*/500,1000,
+        2000,/*3000,4000,*/5000,10000,
         20000
     };
 
@@ -251,7 +251,7 @@ void ResponseCurveComponent::resized()
         xs.add(left + width * normX);
     }
 
-    g.setColour(Colour(69u,69u,69u));
+    g.setColour(Colour(79u,79u,79u));
     for (auto x : xs)
     {
         //auto normX = mapFromLog10(f, 20.f, 20000.f);
@@ -265,10 +265,37 @@ void ResponseCurveComponent::resized()
     for (auto gDb : gain)
     {
         auto y = jmap(gDb, -24.f, 24.f, float(bottom), float(top));
-        g.setColour(gDb == 0.f ? Colour(2u, 76u, 66u) : Colour(69u,69u,69u));
+        g.setColour(gDb == 0.f ? Colour(2u, 76u, 66u) : Colour(79u,79u,79u));
         g.drawHorizontalLine(y, left, right);
     }
-    //g.drawRect(getAnalysisArea());
+    g.setColour(Colour(105u, 105u, 105u));
+    const int fontHeight = 10;
+    g.setFont(fontHeight);
+
+    for (int i = 0; i < freqs.size(); ++i)
+    {
+        auto f = freqs[i];
+        auto x = xs[i];
+
+        bool addK = false;
+        String str;
+        if (f > 999.f)
+        {
+            addK = true;
+            f /= 1000.f;
+        }
+
+        str << f;
+        if (addK) str << "K";
+        str << "Hz";
+        auto textWidth = g.getCurrentFont().getStringWidth(str);
+        Rectangle<int> r;
+        r.setSize(textWidth, fontHeight);
+        r.setCentre(x, 0);
+        r.setY(1);
+        
+        g.drawFittedText(str, r, juce::Justification::centred, 1);
+    }
 }
 
 void ResponseCurveComponent::timerCallback() {
