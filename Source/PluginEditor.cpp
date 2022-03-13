@@ -167,7 +167,6 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
     g.fillAll(Colour(37u, 37u, 37u));
     g.drawImage(background, getLocalBounds().toFloat());
 
-    //auto responseArea = getLocalBounds();
     auto responseArea = getAnalysisArea();
 
     auto w = responseArea.getWidth();
@@ -254,8 +253,6 @@ void ResponseCurveComponent::resized()
     g.setColour(Colour(79u,79u,79u));
     for (auto x : xs)
     {
-        //auto normX = mapFromLog10(f, 20.f, 20000.f);
-        //g.drawVerticalLine(getWidth() * normX, 0.f, getHeight());
         g.drawVerticalLine(x, top, bottom);
     }
     Array<float> gain
@@ -311,6 +308,15 @@ void ResponseCurveComponent::resized()
         g.setColour(gDb == 0.f ? Colour(2u, 76u, 66u) : Colour(105u, 105u, 105u));
         
         g.drawFittedText(str, r, juce::Justification::centred, 1);
+
+        str.clear();
+        str << (gDb - 24.f);
+        r.setX(1);
+        textWidth = g.getCurrentFont().getStringWidth(str);
+        r.setSize(textWidth, fontHeight);
+        g.setColour(Colour(105u, 105u, 105u));
+        g.drawFittedText(str, r, juce::Justification::centred, 1);
+
     }
 }
 
@@ -340,11 +346,6 @@ void ResponseCurveComponent::updateChain()
 juce::Rectangle<int> ResponseCurveComponent::getRenderArea()
 {
     auto bounds = getLocalBounds();
-    /*
-    bounds.reduce(10, //JUCE_LIVE_CONSTANT(5), 
-                  8//JUCE_LIVE_CONSTANT(5)
-    );
-    */
     bounds.removeFromTop(12);
     bounds.removeFromBottom(2);
     bounds.removeFromLeft(20);
