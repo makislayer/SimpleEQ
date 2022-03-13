@@ -221,6 +221,9 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
     for (size_t i = 1; i < mags.size(); ++i) {
         responseCurve.lineTo(responseArea.getX() + i, map(mags[i]));
     }
+
+    leftChannelFFtPath.applyTransform(AffineTransform().translation(responseArea.getX(), responseArea.getY()));
+
     g.setColour(Colour(30u, 119u, 109u));
     g.strokePath(leftChannelFFtPath, PathStrokeType(1.f));
 
