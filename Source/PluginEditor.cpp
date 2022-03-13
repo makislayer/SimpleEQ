@@ -296,6 +296,22 @@ void ResponseCurveComponent::resized()
         
         g.drawFittedText(str, r, juce::Justification::centred, 1);
     }
+    for (auto gDb : gain)
+    {
+        auto y = jmap(gDb, -24.f, 24.f, float(bottom), float(top));
+        String str;
+        if (gDb > 0) str << "+";
+        str << gDb;
+        auto textWidth = g.getCurrentFont().getStringWidth(str);
+
+        Rectangle<int> r;
+        r.setSize(textWidth, fontHeight);
+        r.setX(getWidth() - textWidth);
+        r.setCentre(r.getCentreX(), y);
+        g.setColour(gDb == 0.f ? Colour(2u, 76u, 66u) : Colour(105u, 105u, 105u));
+        
+        g.drawFittedText(str, r, juce::Justification::centred, 1);
+    }
 }
 
 void ResponseCurveComponent::timerCallback() {
